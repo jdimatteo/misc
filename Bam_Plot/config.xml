@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>&lt;p&gt;The generated pdf will be emailed to you.&#xd;
+  &#xd;
+&lt;p&gt;Make sure your Jenkins user email address is valid.&#xd;
+  &#xd;
+&lt;p&gt;The pdf will also be archived in the build history artifacts.</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>bam_files</name>
+          <description>comma separated list of .bam files to be processed (with full paths specified)</description>
+          <defaultValue>/home/data/MM1S_MED1.hg18.bwt.sorted.bam</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>gff</name>
+          <description>Enter .gff or genomic region e.g. chr1:+:1-1000</description>
+          <defaultValue>chr6:+:332864-356961</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>genome</name>
+          <description>specify a genome, options are hg18 or mm9 right now</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>hg18</string>
+              <string>mm9</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>plot</name>
+          <description>Choose either all lines on a single plot or multiple plots</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>MULTIPLE</string>
+              <string>SINGLE</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>y_scale</name>
+          <description>Choose either relative or uniform y axis scaling</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>UNIFORM</string>
+              <string>RELATIVE</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>optional_bam_names</name>
+          <description>Enter a comma separated list of names for your bams (defaults to first section of bam file name, e.g. if the file is /home/data/MM1S_MED1.hg18.bwt.sorted.bam then &quot;MM1S_MED1&quot; will be used as the bam label name on the plot)</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@1.4.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec></refspec>
+        <url>https://github.com/bradnerComputation/pipeline.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>**</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <ignoreNotifyCommit>false</ignoreNotifyCommit>
+    <useShallowClone>false</useShallowClone>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>rm -rf output # remove any prior output directories
+mkdir output  # create a new output directory
+
+if [ -z &quot;$optional_bam_names&quot; ]
+then
+  bam_names=`python ~/scripts/defaultBamNames.py &quot;$bam_files&quot;`
+else
+  bam_names=$optional_bam_names
+fi
+
+python bamPlot.py -b $bam_files -i $gff -g $genome -n $bam_names -p $plot -y $y_scale -t plot_`date +&quot;%Y-%m-%d_%H%M&quot;`.pdf -o `pwd`/output/</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>output/*.pdf</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.30.2">
+      <recipientList>$DEFAULT_RECIPIENTS</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>Attached is the bam plot pdf generated with the following parameters:
+
+$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>true</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>false</sendToRecipientList>
+            <attachmentsPattern></attachmentsPattern>
+            <attachBuildLog>false</attachBuildLog>
+            <compressBuildLog>false</compressBuildLog>
+            <replyTo></replyTo>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>Bam Plot PDF Generation Failed - $gff</subject>
+            <body>Bam plot pdf generation failed with the following parameters.  For assistance, please forward this email to a developer.
+
+$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>true</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>false</sendToRecipientList>
+            <attachmentsPattern></attachmentsPattern>
+            <attachBuildLog>false</attachBuildLog>
+            <compressBuildLog>false</compressBuildLog>
+            <replyTo></replyTo>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>Generated Bam Plot PDF - $gff</defaultSubject>
+      <defaultContent>bam_files: $bam_files
+gff: $gff
+genome: $genome
+plot: $plot
+y_scale: $y_scale
+optional_bam_names: $optional_bam_names
+
+--------
+
+$DEFAULT_CONTENT</defaultContent>
+      <attachmentsPattern>output/*.pdf</attachmentsPattern>
+      <presendScript></presendScript>
+      <attachBuildLog>false</attachBuildLog>
+      <compressBuildLog>false</compressBuildLog>
+      <replyTo>$DEFAULT_REPLYTO</replyTo>
+      <saveOutput>false</saveOutput>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
