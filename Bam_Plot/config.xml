@@ -10,36 +10,51 @@
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>bam_files</name>
-          <description>comma separated list of .bam files to be processed (with full paths specified)</description>
-          <defaultValue>/Users/Shared/Jenkins/data/MM1S_MED1.hg18.bwt.sorted.bam</defaultValue>
-        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>selection</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>MM1S_MED1_added_by_jd</string>
+              <string>MM1S_BRD4_500nM_JQ1</string>
+              <string>MM1S_BRD4_50nM_JQ1</string>
+              <string>MM1S_BRD4_5nM_JQ1</string>
+              <string>MM1S_BRD4_5uM_JQ1</string>
+              <string>MM1S_BRD4_DMSO_2</string>
+              <string>MM1S_CDK9_500nM_JQ1</string>
+              <string>MM1S_CDK9_50nM_JQ1</string>
+              <string>MM1S_CDK9_5nM_JQ1</string>
+              <string>MM1S_CDK9_5uM_JQ1</string>
+              <string>MM1S_CDK9_DMSO_2</string>
+              <string>MM1S_CTCF</string>
+              <string>MM1S_H3K27AC_DMSO</string>
+              <string>MM1S_H3K4ME3_DMSO</string>
+              <string>MM1S_MED1_500nM_JQ1</string>
+              <string>MM1S_MED1_50nM_JQ1</string>
+              <string>MM1S_MED1_5nM_JQ1</string>
+              <string>MM1S_MED1_5uM_JQ1</string>
+              <string>MM1S_MED1_DMSO_2</string>
+              <string>MM1S_RNA_POL2_500nM_JQ1</string>
+              <string>MM1S_RNA_POL2_50nM_JQ1</string>
+              <string>MM1S_RNA_POL2_5nM_JQ1</string>
+              <string>MM1S_RNA_POL2_5uM_JQ1</string>
+              <string>MM1S_RNA_POL2_DMSO_2</string>
+              <string>MM1S_WCE_DMSO_1</string>
+              <string>MM1S_WCE_DMSO_MERGED</string>
+              <string>MM1S_WCE_WT</string>
+              <string>MM1S_p50</string>
+              <string>MM1S_IRF4</string>
+              <string>MM1S_H3K27AC_JQ1</string>
+              <string>MM1S_H3K4ME3_JQ1</string>
+              <string>MM1S_MYC</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>gff</name>
           <description>Enter .gff or genomic region e.g. chr1:+:1-1000</description>
           <defaultValue>chr6:+:332864-356961</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>genome</name>
-          <description>specify a genome, options are hg18 or mm9 right now</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>hg18</string>
-              <string>mm9</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
-        <hudson.model.ChoiceParameterDefinition>
-          <name>plot</name>
-          <description>Choose either all lines on a single plot or multiple plots</description>
-          <choices class="java.util.Arrays$ArrayList">
-            <a class="string-array">
-              <string>MULTIPLE</string>
-              <string>SINGLE</string>
-            </a>
-          </choices>
-        </hudson.model.ChoiceParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>y_scale</name>
           <description>Choose either relative or uniform y axis scaling</description>
@@ -51,8 +66,8 @@
           </choices>
         </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>optional_bam_names</name>
-          <description>Enter a comma separated list of names for your bams (defaults to first section of bam file name, e.g. if the file is /home/data/MM1S_MED1.hg18.bwt.sorted.bam then &quot;MM1S_MED1&quot; will be used as the bam label name on the plot)</description>
+          <name>optional_color_override</name>
+          <description>Override the default color with an RGB value, e.g. 47,26,251</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -70,14 +85,13 @@
       <command>rm -rf output # remove any prior output directories
 mkdir output  # create a new output directory
 
-if [ -z &quot;$optional_bam_names&quot; ]
-then
-  bam_names=`python ~/scripts/defaultBamNames.py &quot;$bam_files&quot;`
-else
-  bam_names=$optional_bam_names
-fi
+data_dir=/Users/Shared/Jenkins/data
 
-python bamPlot.py -b $bam_files -i $gff -g $genome -n $bam_names -p $plot -y $y_scale -t plot_`date +&quot;%Y-%m-%d_%H%M&quot;`.pdf -o `pwd`/output/</command>
+arguments=`python ~/scripts/bamPlotArgumentsFromTable.py $data_dir/MM1S_Table.txt $selection &quot;$optional_color_override&quot;`
+
+# arguments is something like &quot;05242012_D0WUYACXX_3.ACAGTG.hg18.bwt.sorted.bam -g hg18 -c 47,26,251&quot;
+
+python bamPlot.py -n $selection -i $gff -y $y_scale -t plot_`date +&quot;%Y-%m-%d_%H%M&quot;`.pdf -o `pwd`/output/ -p SINGLE -b $data_dir/$arguments</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
