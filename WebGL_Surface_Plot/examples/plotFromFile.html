@@ -10,7 +10,7 @@
         </script>
         <script type="text/javascript" src="../javascript/webgl-utils.js">
         </script>
-        <script type="text/javascript" src="../javascript/underscore-1.3.1.min.js">
+        <!--<script type="text/javascript" src="../javascript/underscore-1.3.1.min.js">-->
         </script>
         <title>SurfacePlot animation example</title>
         
@@ -108,7 +108,7 @@
             <br>
             <br>
             <br>
-            <span style="color: #ffffff">(2) Drag to rotate. Press the shift key and drag the mouse to scale the surface plot.</span>
+            <span style="color: #ffffff">(2) Drag to rotate. Press the shift key and drag the mouse to scale the surface plot.  Use the a, w, s, d, q, and e keys to spin along a single axis.  Use the arrow keys to move the camera.  Use the space key to reset the rotation/scaling/and shifting.</span>
             <br>
             <br>
         </div>
@@ -183,8 +183,15 @@
                 for (var i = 0; i < rows; i++) {
                     line = allTextLines[i];
                     data = line.split(',');
+                    cols = data.length;
+
+                    if (i == rows - 1 && cols == 1 && data[0] == "")
+                    {
+                        // skip end of line newline
+                        rows = rows - 1;
+                        break; 
+                    }
                     zValues[i] = [];
-					cols = data.length;
 					
 					for (var j = 0; j < cols; j++) {
 					
