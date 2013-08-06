@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>&lt;p&gt;The generated pdf will be emailed to you.&#xd;
+  &#xd;
+&lt;p&gt;Make sure your Jenkins user email address is valid.&#xd;
+  &#xd;
+&lt;p&gt;The pdf will also be archived in the build history artifacts.</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>selection</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>MM1S_MED1_added_by_jd</string>
+              <string>MM1S_BRD4_500nM_JQ1</string>
+              <string>MM1S_BRD4_50nM_JQ1</string>
+              <string>MM1S_BRD4_5nM_JQ1</string>
+              <string>MM1S_BRD4_5uM_JQ1</string>
+              <string>MM1S_BRD4_DMSO_2</string>
+              <string>MM1S_CDK9_500nM_JQ1</string>
+              <string>MM1S_CDK9_50nM_JQ1</string>
+              <string>MM1S_CDK9_5nM_JQ1</string>
+              <string>MM1S_CDK9_5uM_JQ1</string>
+              <string>MM1S_CDK9_DMSO_2</string>
+              <string>MM1S_CTCF</string>
+              <string>MM1S_H3K27AC_DMSO</string>
+              <string>MM1S_H3K4ME3_DMSO</string>
+              <string>MM1S_MED1_500nM_JQ1</string>
+              <string>MM1S_MED1_50nM_JQ1</string>
+              <string>MM1S_MED1_5nM_JQ1</string>
+              <string>MM1S_MED1_5uM_JQ1</string>
+              <string>MM1S_MED1_DMSO_2</string>
+              <string>MM1S_RNA_POL2_500nM_JQ1</string>
+              <string>MM1S_RNA_POL2_50nM_JQ1</string>
+              <string>MM1S_RNA_POL2_5nM_JQ1</string>
+              <string>MM1S_RNA_POL2_5uM_JQ1</string>
+              <string>MM1S_RNA_POL2_DMSO_2</string>
+              <string>MM1S_WCE_DMSO_1</string>
+              <string>MM1S_WCE_DMSO_MERGED</string>
+              <string>MM1S_WCE_WT</string>
+              <string>MM1S_p50</string>
+              <string>MM1S_IRF4</string>
+              <string>MM1S_H3K27AC_JQ1</string>
+              <string>MM1S_H3K4ME3_JQ1</string>
+              <string>MM1S_MYC</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>gff</name>
+          <description>Enter .gff or genomic region e.g. chr1:+:1-1000</description>
+          <defaultValue>chr6:+:332864-356961</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>y_scale</name>
+          <description>Choose either relative or uniform y axis scaling</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>UNIFORM</string>
+              <string>RELATIVE</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>optional_color_override</name>
+          <description>Override the default color with an RGB value, e.g. 47,26,251</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>rm -rf output # remove any prior output directories
+mkdir output  # create a new output directory
+
+data_dir=/Users/Shared/Jenkins/data
+
+arguments=`python ~/scripts/bamPlotArgumentsFromTable.py $data_dir/MM1S_Table.txt $selection &quot;$optional_color_override&quot;`
+
+# arguments is something like &quot;05242012_D0WUYACXX_3.ACAGTG.hg18.bwt.sorted.bam -g hg18 -c 47,26,251&quot;
+
+python bamPlot.py -n $selection -i $gff -y $y_scale -t plot_`date +&quot;%Y-%m-%d_%H%M&quot;`.pdf -o `pwd`/output/ -p SINGLE -b $data_dir/$arguments</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>output/*.pdf</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>
