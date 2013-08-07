@@ -1206,28 +1206,30 @@ JSSurfacePlot = function(x, y, width, height, colourGradient, targetElement, fil
         var spinLeftKey = 81;  // q
         var spinRightKey = 69; // e
         var resetKey = 32;     // space bar 
+        var rotationalFactor = 5;
 
         switch(event.keyCode)
         {
         case leftKey:
-            deltaX = -5;
+            deltaX = -1;
             break;
         case rightKey:
-            deltaX = 5;
+            deltaX = 1;
             break;
         case downKey:
-            deltaY = 5;
+            deltaY = 1;
             break;
         case upKey:
-            deltaY = -5;
+            deltaY = -1;
             break;
         case spinLeftKey:
-            deltaZ = 5;
+            deltaZ = 1;
             break;
         case spinRightKey:
-            deltaZ = -5;
+            deltaZ = -1;
             break;
         case resetKey:
+            rotationalFactor = 1;
             mat4.identity(this.rotationMatrix);
             deltaY = JSSurfacePlot.DEFAULT_X_ANGLE_WEBGL;
             deltaZ = JSSurfacePlot.DEFAULT_Y_ANGLE_WEBGL;
@@ -1238,18 +1240,19 @@ JSSurfacePlot = function(x, y, width, height, colourGradient, targetElement, fil
 
         var newRotationMatrix = mat4.create();
         mat4.identity(newRotationMatrix);
-        
-        mat4.rotate(newRotationMatrix, degToRad(deltaX), [0, 1, 0]);
-        mat4.rotate(newRotationMatrix, degToRad(deltaY), [1, 0, 0]);
-        mat4.rotate(newRotationMatrix, degToRad(deltaZ), [0, 0, 1]);
-        mat4.multiply(newRotationMatrix, this.rotationMatrix, this.rotationMatrix);
-        
-        if (this.otherPlots) {
-            var numPlots = this.otherPlots.length;
-            for (var i = 0; i < numPlots; i++) {
-                this.otherPlots[i].rotate(deltaX, deltaY);
-            }
+
+        var shiftPressed = isShiftPressed(event);
+        if (shiftPressed && event.keyCode != resetKey) {
+            mat4.translate(newRotationMatrix, [0.02*deltaX, -0.02*deltaY, -1*deltaZ]);
         }
+        else
+        {
+            mat4.rotate(newRotationMatrix, degToRad(rotationalFactor*deltaX), [0, 1, 0]);
+            mat4.rotate(newRotationMatrix, degToRad(rotationalFactor*deltaY), [1, 0, 0]);
+            mat4.rotate(newRotationMatrix, degToRad(rotationalFactor*deltaZ), [0, 0, 1]);
+        }
+
+        mat4.multiply(newRotationMatrix, this.rotationMatrix, this.rotationMatrix);
     };
     
     this.handleMouseMove = function(event, context){
