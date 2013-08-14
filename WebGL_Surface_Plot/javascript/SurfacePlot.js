@@ -1205,7 +1205,7 @@ JSSurfacePlot = function(x, y, width, height, colourGradient, targetElement, fil
         var downKey = 83;      // s
         var spinLeftKey = 81;  // q
         var spinRightKey = 69; // e
-        var resetKey = 32;     // space bar 
+        var resetKey = 27;     // esc
         var rotationalFactor = 5;
 
         switch(event.keyCode)
