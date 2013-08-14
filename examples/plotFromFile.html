@@ -101,17 +101,16 @@
     </head>
     <body style="background:#000; color:#ffffff">
         <div id="input" style="display:block">
-            <p>Open a csv file: </span>
+            <p>Open a csv file:
+            <img src="images/ajax-loader.gif" style="visibility: hidden;" id="loading_image">
             <input type="file" id="filePicker" name="files[]" style="color:#000"/> <!-- match background color to hide text "No file chosen"-->
-            <p>The csv file represents an array of z values, with the first row representing z values when x = 0, the last row representing z values when x = 1, the first column representing z values when y = 0, and the last column representing z values when y = 1. Here is a <a href="./simple.csv">simple data file example</a>, and <a href="./complex.csv">a more complex one</a>.</span>
+            <p>The csv file represents an array of z values, with the first row representing z values when x = 0, the last row representing z values when x = 1, the first column representing z values when y = 0, and the last column representing z values when y = 1. Here is a <a href="./simple.csv" style="color:#0080FF">simple data file example</a>, and <a href="./complex.csv" style="color:#0080FF">a more complex one</a>.</span>
             <p>This has been tested on the latest versions of Chrome and Firefox.  It uses webgl for hardware accelerated graphics, which may not yet be properly supported in Internet Explorer, Safari, or other browsers.
         </div>
         <div id="presentation" style="display:none">
             <p>Drag to rotate. Press the shift key and drag to scale. Use the a, w, s, d, q, e keys to rotate, and with shift to move. Use esc key to reset.</span>
             <div id='surfacePlotDiv' style="width: 800px; height: 840px; text-align:center">
 			
-			    <img src="images/ajax-loader.gif" style="visibility: hidden;" id="loading_image">
-				
                 <!-- SurfacePlot goes here -->
             </div>
             <p>If you are having trouble rotating after moving the plot, try resetting (with the escape key) and then rotating before moving.</span>
