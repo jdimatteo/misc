@@ -3,13 +3,20 @@
   <actions/>
   <description>&lt;p&gt;The generated pdf will be emailed to you.&#xd;
   &#xd;
-&lt;p&gt;Make sure your Jenkins user email address is valid.&#xd;
-  &#xd;
 &lt;p&gt;The pdf will also be archived in the build history artifacts.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>email</name>
+          <description>&lt;p&gt;Email addresss that the generated map will be emailed to, not required if you are logged in and have set your email address.
+
+&lt;p&gt;You can &lt;a href=&quot;../../login&quot;&gt;log in&lt;/a&gt; using your TOD Linux user name and password.  You can configure your email address by clicking your name at &lt;a href=&quot;../../asynchPeople/&quot;&gt;the people page&lt;/a&gt; and then clicking the &quot;Configure&quot; &lt;img src=&quot;../../static/3880e91f/images/24x24/setting.png&quot; alt=&quot;configure_icon&quot;&gt;link.
+
+&lt;p&gt;Even if no address is provided, the generated map will be available in the build history artifacts when it is complete.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>selection</name>
           <description></description>
@@ -121,7 +128,7 @@
       <command>rm -rf output # remove any prior output directories
 mkdir output  # create a new output directory
 
-data_dir=/home/data
+data_dir=/ark/home/jenkins/jobs/Bam_Plot/placeholder_data # temporary, until Charles gives me the real data path
 
 arguments=`python ~/scripts/bamPlotArgumentsFromTable.py $data_dir/MM1S_Table.txt $selection &quot;$optional_color_override&quot;`
 
@@ -137,7 +144,7 @@ python bamPlot.py -n $selection -i $gff -y $y_scale -t plot_`date +&quot;%Y-%m-%
       <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.30.2">
-      <recipientList>$DEFAULT_RECIPIENTS</recipientList>
+      <recipientList>$email</recipientList>
       <configuredTriggers>
         <hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
           <email>
@@ -149,7 +156,7 @@ $PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>true</sendToRequester>
             <includeCulprits>false</includeCulprits>
-            <sendToRecipientList>false</sendToRecipientList>
+            <sendToRecipientList>true</sendToRecipientList>
             <attachmentsPattern></attachmentsPattern>
             <attachBuildLog>false</attachBuildLog>
             <compressBuildLog>false</compressBuildLog>
@@ -166,7 +173,7 @@ $PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>true</sendToRequester>
             <includeCulprits>false</includeCulprits>
-            <sendToRecipientList>false</sendToRecipientList>
+            <sendToRecipientList>true</sendToRecipientList>
             <attachmentsPattern></attachmentsPattern>
             <attachBuildLog>false</attachBuildLog>
             <compressBuildLog>false</compressBuildLog>
