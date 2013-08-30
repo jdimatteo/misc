@@ -1,5 +1,0 @@
-This is copied from https://webgl-surface-plot.googlecode.com/files/WebGL_Surface_Plot%20V1.5.zip
-
-I made some changes to clean up plotFromFile.html.  I also added keyboard controls and updated the csv file processing to handle a newline at the end of the file.
-
-The licence was in .docx format, and I converted it to .txt so that it is more easily readable.  Unfortunately the licence doesn't appear complete, and still includes place holder text like "Copyright [yyyy] [name of copyright owner]".  I just left it as is.
